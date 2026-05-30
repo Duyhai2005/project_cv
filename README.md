@@ -1,11 +1,11 @@
 # Fruit Ripeness Computer Vision
 
-Du an gom hai notebook doc lap cho bai toan nhan dien do chin trai cay:
+Dự án gồm hai notebook độc lập cho bài toán nhận diện độ chín trái cây:
 
-- `image_processing_and_ml.ipynb`: xu ly anh co dien, phan doan anh, trich xuat dac trung va phan loai bang KNN.
-- `deep_learning.ipynb`: phat hien trai cay theo bounding box bang YOLOv11, Faster R-CNN va SSD300 VGG16.
+- `image_processing_and_ml.ipynb`: xử lý ảnh cổ điển, phân đoạn ảnh, trích xuất đặc trưng và phân loại bằng KNN.
+- `deep_learning.ipynb`: phát hiện trái cây theo bounding box bằng YOLOv11, Faster R-CNN và SSD300 VGG16.
 
-## Cau Truc
+## Cấu Trúc
 
 ```text
 project_cv/
@@ -22,14 +22,14 @@ project_cv/
     +-- test/images, test/labels
 ```
 
-Hai notebook dung hai bo du lieu khac nhau:
+Hai notebook dùng hai bộ dữ liệu khác nhau:
 
-- Dataset classification trong `archive/.../dataset` co cau truc `train/test/<class>`.
-- Dataset detection trong `deepl_dataset` co dinh dang YOLO, gom anh va file label `.txt`.
+- Dataset classification trong `archive/.../dataset` có cấu trúc `train/test/<class>`.
+- Dataset detection trong `deepl_dataset` có định dạng YOLO, gồm ảnh và file label `.txt`.
 
-## Moi Truong
+## Môi Trường
 
-Khuyen nghi dung Python 3.12 va GPU CUDA cho notebook deep learning. CPU van chay duoc nhung thoi gian train se rat lau.
+Khuyến nghị dùng Python 3.12 và GPU CUDA cho notebook deep learning. CPU vẫn chạy được nhưng thời gian train sẽ rất lâu.
 
 ```powershell
 python -m venv .venv
@@ -38,15 +38,15 @@ python -m pip install -U pip
 pip install numpy pandas matplotlib seaborn opencv-python pillow scikit-learn scikit-image tqdm pyyaml torch torchvision torchmetrics ultralytics timm
 ```
 
-Neu dung PyTorch voi CUDA, cai ban `torch`/`torchvision` phu hop voi driver va CUDA tren may.
+Nếu dùng PyTorch với CUDA, cài bản `torch`/`torchvision` phù hợp với driver và CUDA trên máy.
 
 ## Dataset
 
 ### Classification Dataset
 
-Notebook `image_processing_and_ml.ipynb` tu dong tim dataset local bang `FRUIT_RIPENESS_DATASET_DIR` hoac `DATA_DIR`; neu khong co bien moi truong, notebook tim trong `archive/fruit_ripeness_dataset/archive (1)/dataset`.
+Notebook `image_processing_and_ml.ipynb` tự động tìm dataset local bằng `FRUIT_RIPENESS_DATASET_DIR` hoặc `DATA_DIR`; nếu không có biến môi trường, notebook tìm trong `archive/fruit_ripeness_dataset/archive (1)/dataset`.
 
-Tong cong 19,956 anh: 16,217 train va 3,739 test.
+Tổng cộng 19,956 ảnh: 16,217 train và 3,739 test.
 
 | Class | Train | Test |
 | --- | ---: | ---: |
@@ -62,9 +62,9 @@ Tong cong 19,956 anh: 16,217 train va 3,739 test.
 
 ### Detection Dataset
 
-Notebook `deep_learning.ipynb` tu dong tim dataset local bang `DEEPL_DATASET_DIR` hoac `DATA_DIR`; neu khong co bien moi truong, notebook tim trong `deepl_dataset`.
+Notebook `deep_learning.ipynb` tự động tìm dataset local bằng `DEEPL_DATASET_DIR` hoặc `DATA_DIR`; nếu không có biến môi trường, notebook tìm trong `deepl_dataset`.
 
-Dataset detection duoc xuat tu Roboflow, license CC BY 4.0, gom 4 class:
+Dataset detection được xuất từ Roboflow, license CC BY 4.0, gồm 4 class:
 
 ```text
 Ripe, Rotten, Unripe, overripe
@@ -76,7 +76,7 @@ Ripe, Rotten, Unripe, overripe
 | valid | 712 | 712 |
 | test | 713 | 713 |
 
-So luong object theo class trong file label:
+Số lượng object theo class trong file label:
 
 | Split | Ripe | Rotten | Unripe | overripe |
 | --- | ---: | ---: | ---: | ---: |
@@ -84,61 +84,61 @@ So luong object theo class trong file label:
 | valid | 200 | 189 | 253 | 221 |
 | test | 229 | 183 | 225 | 241 |
 
-## Notebook Xu Ly Anh Va ML Co Dien
+## Notebook Xử Lý Ảnh Và ML Cổ Điển
 
 File: `image_processing_and_ml.ipynb`
 
-Pipeline chinh:
+Pipeline chính:
 
-1. Doc dataset classification local va tao dataframe `image_path`, `label`, `split`.
-2. Ma hoa label bang `LabelEncoder`; tao `CNNFruitDataset` va `DataLoader` de kiem tra batch anh 224x224.
-3. Truc quan mau anh theo class va cac bieu dien mau RGB, grayscale, HSV, LAB.
-4. Tien xu ly anh: crop giua voi `crop_ratio=0.9`, resize ve 128x128 hoac 256x256, Gaussian blur.
-5. Phan doan anh:
-   - Otsu threshold tren kenh HSV-S hoac LAB-a*.
-   - Canny edge tren kenh HSV-V hoac LAB-L.
-   - Morphology, tim contour lon nhat, tao mask va bounding box.
-6. Trich xuat dac trung:
-   - Trung binh 2 kenh mau theo mask.
-   - Dien tich contour.
-   - Mean HOG tren anh grayscale 128x128.
-7. Chuan hoa dac trung bang `StandardScaler`.
-8. Train KNN voi `GridSearchCV`, tim `n_neighbors`, `weights`, `metric`.
+1. Đọc dataset classification local và tạo dataframe `image_path`, `label`, `split`.
+2. Mã hóa label bằng `LabelEncoder`; tạo `CNNFruitDataset` và `DataLoader` để kiểm tra batch ảnh 224x224.
+3. Trực quan mẫu ảnh theo class và các biểu diễn màu RGB, grayscale, HSV, LAB.
+4. Tiền xử lý ảnh: crop giữa với `crop_ratio=0.9`, resize về 128x128 hoặc 256x256, Gaussian blur.
+5. Phân đoạn ảnh:
+   - Otsu threshold trên kênh HSV-S hoặc LAB-a*.
+   - Canny edge trên kênh HSV-V hoặc LAB-L.
+   - Morphology, tìm contour lớn nhất, tạo mask và bounding box.
+6. Trích xuất đặc trưng:
+   - Trung bình 2 kênh màu theo mask.
+   - Diện tích contour.
+   - Mean HOG trên ảnh grayscale 128x128.
+7. Chuẩn hóa đặc trưng bằng `StandardScaler`.
+8. Train KNN với `GridSearchCV`, tìm `n_neighbors`, `weights`, `metric`.
 
-Ket qua KNN da luu trong notebook:
+Kết quả KNN đã lưu trong notebook:
 
-| Phuong phap | K toi uu | Trong so | Khoang cach | Train Acc | Val Acc | Test Acc | Gap |
+| Phương pháp | K tối ưu | Trọng số | Khoảng cách | Train Acc | Val Acc | Test Acc | Gap |
 | --- | ---: | --- | --- | ---: | ---: | ---: | ---: |
 | OTSU_HSV | 4 | distance | manhattan | 100.00% | 78.81% | 83.82% | 16.18% |
 | OTSU_LAB | 3 | distance | manhattan | 100.00% | 79.79% | 82.21% | 17.79% |
 | CANNY_HSV | 7 | distance | manhattan | 99.99% | 54.27% | 57.18% | 42.81% |
 | CANNY_LAB | 10 | distance | manhattan | 99.99% | 58.71% | 62.48% | 37.52% |
 
-Nhan xet ngan: Otsu ket hop dac trung mau cho ket qua tot hon Canny trong bai toan classification nay. Cac mo hinh KNN co train accuracy gan 100%, nen can chu y nguy co overfitting.
+Nhận xét ngắn: Otsu kết hợp đặc trưng màu cho kết quả tốt hơn Canny trong bài toán classification này. Các mô hình KNN có train accuracy gần 100%, nên cần chú ý nguy cơ overfitting.
 
 ## Notebook Deep Learning
 
 File: `deep_learning.ipynb`
 
-Pipeline chinh:
+Pipeline chính:
 
-1. Cai `ultralytics` va `torchmetrics`.
-2. Dat seed, chon `device`, xac dinh `WORK_DIR`.
-3. Tim dataset YOLO local, doc `data.yaml`, tao `deepl_dataset_local.yaml` voi duong dan tuyet doi de Ultralytics train on local.
-4. Truc quan ground-truth bounding box va thong ke object theo split/class.
+1. Cài `ultralytics` và `torchmetrics`.
+2. Đặt seed, chọn `device`, xác định `WORK_DIR`.
+3. Tìm dataset YOLO local, đọc `data.yaml`, tạo `deepl_dataset_local.yaml` với đường dẫn tuyệt đối để Ultralytics train local.
+4. Trực quan ground-truth bounding box và thống kê object theo split/class.
 5. Train YOLOv11:
-   - Weights mac dinh: `yolo11n.pt`, hoac `YOLO_WEIGHTS_PATH` neu da co file local.
+   - Weights mặc định: `yolo11n.pt`, hoặc `YOLO_WEIGHTS_PATH` nếu đã có file local.
    - `YOLO_EPOCHS = 30`, `YOLO_IMGSZ = 640`, `YOLO_BATCH = 16`.
 6. Train Faster R-CNN:
    - Backbone ResNet50 FPN.
-   - Them background class cho Torchvision detection, nen label YOLO duoc cong 1.
+   - Thêm background class cho Torchvision detection, nên label YOLO được cộng 1.
    - `FRCNN_EPOCHS = 10`, `FRCNN_BATCH = 4`.
 7. Train SSD300 VGG16:
    - `SSD_EPOCHS = 20`, `SSD_BATCH = 4`.
-8. Danh gia detection bang IoU matching, NMS, `torchmetrics.MeanAveragePrecision`, confusion matrix va classification report.
-9. Tong hop metric: Precision, Recall, F1, mAP@0.5, mAP@0.5:0.95, Mean IoU, thoi gian inference va FPS.
+8. Đánh giá detection bằng IoU matching, NMS, `torchmetrics.MeanAveragePrecision`, confusion matrix và classification report.
+9. Tổng hợp metric: Precision, Recall, F1, mAP@0.5, mAP@0.5:0.95, Mean IoU, thời gian inference và FPS.
 
-Ket qua tong hop da luu trong notebook:
+Kết quả tổng hợp đã lưu trong notebook:
 
 | Model | Precision | Recall | F1-score | mAP@0.5 | mAP@0.5:0.95 | Mean IoU | Sec/Image | FPS |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -146,7 +146,7 @@ Ket qua tong hop da luu trong notebook:
 | Faster R-CNN | 0.8224 | 0.9180 | 0.8676 | 0.8915 | 0.7787 | 0.9284 | 0.1211 | 8.25 |
 | SSD300 VGG16 | 0.7987 | 0.8679 | 0.8319 | 0.8207 | 0.5694 | 0.8439 | 0.0286 | 34.97 |
 
-Notebook cung co output rieng tu Ultralytics cho YOLO tren test set:
+Notebook cũng có output riêng từ Ultralytics cho YOLO trên test set:
 
 | Metric | Value |
 | --- | ---: |
@@ -157,20 +157,20 @@ Notebook cung co output rieng tu Ultralytics cho YOLO tren test set:
 | mAP@0.5:0.95 | 0.9226 |
 | FPS | 171.04 |
 
-Bang tong hop cuoi notebook uu tien evaluator tu viet de so sanh cung logic IoU/matching giua YOLOv11, Faster R-CNN va SSD300.
+Bảng tổng hợp cuối notebook ưu tiên evaluator tự viết để so sánh cùng logic IoU/matching giữa YOLOv11, Faster R-CNN và SSD300.
 
-## Cach Chay
+## Cách Chạy
 
-### Chay notebook classification
+### Chạy notebook classification
 
 ```powershell
 $env:FRUIT_RIPENESS_DATASET_DIR="C:\project\project_cv\archive\fruit_ripeness_dataset\archive (1)\dataset"
 jupyter notebook image_processing_and_ml.ipynb
 ```
 
-Chay tu tren xuong duoi. Notebook se tao cac truc quan dataset, preprocessing, segmentation, HOG, sau do train va danh gia KNN.
+Chạy từ trên xuống dưới. Notebook sẽ tạo các trực quan dataset, preprocessing, segmentation, HOG, sau đó train và đánh giá KNN.
 
-### Chay notebook detection
+### Chạy notebook detection
 
 ```powershell
 $env:DEEPL_DATASET_DIR="C:\project\project_cv\deepl_dataset"
@@ -179,24 +179,24 @@ $env:USE_PRETRAINED_WEIGHTS="1"
 jupyter notebook deep_learning.ipynb
 ```
 
-Khi chay local, cac file sinh ra co the nam trong `DL_WORK_DIR`:
+Khi chạy local, các file sinh ra có thể nằm trong `DL_WORK_DIR`:
 
 - `deepl_dataset_local.yaml`
 - `runs/yolo11_fruit_ripeness/`
 - `faster_rcnn_best.pth`
 - `ssd300_vgg16_best.pth`
-- `yolo11n.pt` neu Ultralytics tai weights ve local
+- `yolo11n.pt` nếu Ultralytics tải weights về local
 
-Neu moi truong khong co internet hoac khong muon tai pretrained weights:
+Nếu môi trường không có internet hoặc không muốn tải pretrained weights:
 
 ```powershell
 $env:YOLO_WEIGHTS_PATH="C:\path\to\yolo11n.pt"
 $env:USE_PRETRAINED_WEIGHTS="0"
 ```
 
-## Luu Y
+## Lưu Ý
 
-- Ket qua trong README duoc lay tu output da luu trong hai notebook; khi train lai, metric co the thay doi theo hardware, version thu vien va seed.
-- Accuracy khong phai metric chinh cho object detection; notebook deep learning uu tien mAP, IoU, Precision, Recall va FPS.
-- Dataset detection co the co nhieu object trong mot anh, vi vay tong object theo class lon hon so anh.
-- Notebook classification dang dung dac trung thu cong va KNN; `CNNFruitDataset`/`DataLoader` moi duoc dung de kiem tra du lieu, chua co phan train CNN trong notebook nay.
+- Kết quả trong README được lấy từ output đã lưu trong hai notebook; khi train lại, metric có thể thay đổi theo hardware, version thư viện và seed.
+- Accuracy không phải metric chính cho object detection; notebook deep learning ưu tiên mAP, IoU, Precision, Recall và FPS.
+- Dataset detection có thể có nhiều object trong một ảnh, vì vậy tổng object theo class lớn hơn số ảnh.
+- Notebook classification đang dùng đặc trưng thủ công và KNN; `CNNFruitDataset`/`DataLoader` mới được dùng để kiểm tra dữ liệu, chưa có phần train CNN trong notebook này.
